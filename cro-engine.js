@@ -12,15 +12,16 @@
  *   Open the console and run  croGetResults()  to see pageviews,
  *   conversions, and conversion rate per variation.
  */
+
 (function () {
   var CONFIG_URL = 'experiments.json';
   var COOKIE_NAME = '_cro_vid';
   var EVENTS_KEY = 'cro_events';
   var BUCKET_SIZE = 10000;
 
-  // Paste your Google Apps Script Web App URL here after deploying it
-  var BACKEND_URL =
-    'https://script.google.com/macros/s/AKfycbye8g2rMA0EWhpaZxLTiBxqRcIJaIe4Qu9u7d9EdkYGUzfYbg6HtGg1Q92lA5cZ4XLdOQ/exec';
+  // // Google Apps Script Web App URL after deploying it
+  // var BACKEND_URL =
+  //   'https://script.google.com/macros/s/AKfycbye8g2rMA0EWhpaZxLTiBxqRcIJaIe4Qu9u7d9EdkYGUzfYbg6HtGg1Q92lA5cZ4XLdOQ/exec';
 
   var currentVisitorId = null;
 
@@ -93,19 +94,33 @@
       console.error('cro failed to save event locally', e);
     }
 
-    // Shared copy — every real visitor's events land in the same Sheet
-    if (BACKEND_URL && BACKEND_URL.indexOf('PASTE_') !== 0) {
-      fetch(BACKEND_URL, {
-        method: 'POST',
-        mode: 'no-cors', // Apps Script doesn't return CORS headers; fire-and-forget is fine here
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      }).catch(function (err) {
-        console.error('cro failed to send event to backend', err);
-      });
-    }
+    // Google sheets - Shared copy — every real visitor's events land in the same Sheet
+    // if (BACKEND_URL && BACKEND_URL.indexOf('PASTE_') !== 0) {
+    //   fetch(BACKEND_URL, {
+    //     method: 'POST',
+    //     mode: 'no-cors', // Apps Script doesn't return CORS headers; fire-and-forget is fine here
+    //     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    //     body: JSON.stringify(payload)
+    //   }).catch(function (err) {
+    //     console.error('cro failed to send event to backend', err);
+    //   });
+    // }
 
-    console.log('cro event:', eventName, experimentId, variationId);
+    // console.log('cro event:', eventName, experimentId, variationId);
+
+    // GTM datalayer
+    try {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'cro_' + eventName,
+        cro_event_name: eventName,
+        cro_experiment_id: experimentId,
+        cro_variation_id: variationId,
+        cro_visitor_id: currentVisitorId
+      });
+    } catch (e) {
+      console.error('cro gtm - failed to push to dataLayer', e);
+    }
   }
 
   // 6. Wire up the goal element (if configured) to fire a conversion event
