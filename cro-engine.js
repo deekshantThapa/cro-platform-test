@@ -94,7 +94,8 @@
       console.error('cro failed to save event locally', e);
     }
 
-    // Google sheets - Shared copy — every real visitor's events land in the same Sheet
+    // Google sheets — every real visitor's events land in the same Sheet
+
     // if (BACKEND_URL && BACKEND_URL.indexOf('PASTE_') !== 0) {
     //   fetch(BACKEND_URL, {
     //     method: 'POST',
