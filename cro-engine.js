@@ -68,13 +68,14 @@
 
   // 5. Report an event (pageview or conversion) to GTM via the dataLayer
 
-  function trackEvent(eventName, experimentId, variationId) {
+  function trackEvent(eventName, experimentId, variationId, goalId) {
     try {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: 'cro_' + eventName,
         cro_experiment_id: experimentId,
         cro_variation_id: variationId,
+        cro_goal_id: goalId,
         cro_visitor_id: currentVisitorId
       });
     } catch (e) {
@@ -85,11 +86,12 @@
   // 6. Wire up the goal element (if configured) to fire a conversion event
 
   function attachGoalListener(experiment, variationId) {
-    if (!experiment.goalSelector) return;
-    const el = document.querySelector(experiment.goalSelector);
-    if (!el) return;
-    el.addEventListener('click', function () {
-      trackEvent('conversion', experiment.id, variationId);
+    (experiment.goals || []).forEach(function (goal) {
+      document.querySelectorAll(goal.selector).forEach(function (el) {
+        el.addEventListener('click', function () {
+          trackEvent('conversion', experiment.id, variationId, goal.id);
+        });
+      });
     });
   }
 

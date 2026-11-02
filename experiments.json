@@ -3,7 +3,10 @@
     {
       "id": "hero_headline_test",
       "trafficAllocation": 10000,
-      "goalSelector": "#intro a[href=\"#features\"]",
+      "goals": [
+        { "id": "hero_features_btn_click", "selector": "#intro a[href=\"#features\"]" },
+        { "id": "menu_click", "selector": ".menu-toggle" }
+      ],
       "variations": [
         { "id": "control", "weight": 3333 },
         { "id": "variant_a", "weight": 3333 },
