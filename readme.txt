@@ -1,5 +1,4 @@
-This is the landing page template by (http://www.styleshout.com/) deployed here purely for
-testing an in-house A/B testing engine.
+This is the landing page deployed here for testing an in-house A/B testing engine.
 
 The goal is to understand and replicate, at a small scale, how client-side experimentation
 platforms like Optimizely work — visitor bucketing, variation rendering, and event
