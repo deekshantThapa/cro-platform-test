@@ -10,11 +10,12 @@
  */
 
 (function () {
-  const CONFIG_URL = 'experiments.json';
+  const CONFIG_URL = 'http://localhost:5000/api/V1/public/experiments';
   const COOKIE_NAME = 'cro_vid';
   const BUCKET_SIZE = 10000;
 
   let currentVisitorId = null;
+  const experimentNames = {};
 
   // 1. Get or create a persistent visitor ID (180-day cookie)
 
@@ -76,7 +77,8 @@
         cro_experiment_id: experimentId,
         cro_variation_id: variationId,
         cro_goal_id: goalId,
-        cro_visitor_id: currentVisitorId
+        cro_visitor_id: currentVisitorId,
+        cro_experiment_name: experimentNames[experimentId]
       });
     } catch (e) {
       console.error('cro gtm - failed to push to dataLayer', e);
@@ -101,19 +103,19 @@
     const assignments = {};
 
     (config.experiments || []).forEach(function (experiment) {
-      const forced = previewOverrides[experiment.id];
+      experimentNames[experiment.id] = experiment.name;
+      const forced = previewOverrides[experiment.id] || previewOverrides[experiment.name];
       const variationId = forced || assignVariation(currentVisitorId, experiment);
       const finalVariationId = variationId || 'control';
       assignments[experiment.id] = finalVariationId;
 
       if (variationId && variationId !== 'control') {
-        const action =
-          window.croVariations &&
-          window.croVariations[experiment.id] &&
-          window.croVariations[experiment.id][variationId];
-        if (typeof action === 'function') {
+        const v = experiment.variations.find(function (x) {
+          return x.id === variationId;
+        });
+        if (v && v.code) {
           try {
-            action();
+            new Function(v.code)();
           } catch (e) {
             console.error('cro variation error in', experiment.id, variationId, e);
           }
